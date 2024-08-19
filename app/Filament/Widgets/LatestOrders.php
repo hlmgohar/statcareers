@@ -2,18 +2,16 @@
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Resources\OrderResource;
-use App\Models\Order;
-use Filament\Tables\Actions\Action;
+use App\Filament\Resources\Shop\OrderResource;
+use App\Models\Shop\Order;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Squire\Models\Currency;
 
 class LatestOrders extends BaseWidget
 {
-
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     protected static ?int $sort = 2;
 
@@ -23,67 +21,34 @@ class LatestOrders extends BaseWidget
             ->query(OrderResource::getEloquentQuery())
             ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc')
-
             ->columns([
-
-                TextColumn::make('grand_total')
-                    ->label('Grand Total')
-                    ->money('INR')
-                    ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('id')
-                    ->label('Order ID')
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Order Date')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('number')
                     ->searchable()
                     ->sortable(),
-
-                TextColumn::make('user.name')
-                    ->label('Customer')
-                    ->searchable(),
-
-                TextColumn::make('status')
-                    ->label('Order Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match($state){
-                        'new' => 'info',
-                        'processing' => 'warning',
-                        'shipped' => 'success',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                    })
-                    ->icon(fn (string $state): string => match($state){
-                        'new' => 'heroicon-m-sparkles',
-                        'processing' => 'heroicon-m-arrow-path',
-                        'shipped' => 'heroicon-m-truck',
-                        'delivered' => 'heroicon-m-check-badge',
-                        'cancelled' => 'heroicon-m-x-circle',
-                    })
-                    ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('payment_method')
-                    ->label('Payment Method')
-                    ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('payment_status')
-                    ->label('Payment Status')
-                    ->sortable()
-                    ->badge()
-                    ->searchable(),
-                
-                TextColumn::make('created_at')
-                    ->label('Order Date')
-                    ->dateTime()
-                    ->sortable()
-                    ->searchable(),
-
+                Tables\Columns\TextColumn::make('customer.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge(),
+                Tables\Columns\TextColumn::make('currency')
+                    ->getStateUsing(fn ($record): ?string => Currency::find($record->currency)?->name ?? null)
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('total_price')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('shipping_price')
+                    ->label('Shipping cost')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->actions([
-                Action::make('View')
-                    ->url(fn (Order $record):string => OrderResource::getUrl('view', ['record' => $record]))
-                    ->color('info')
-                    ->icon('heroicon-o-eye'),
+                Tables\Actions\Action::make('open')
+                    ->url(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record])),
             ]);
     }
 }
