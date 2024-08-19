@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8" />
 
-        <title>{{ $title ?? 'Statcareers' }}</title>
+        <meta name="application-name" content="{{ config('app.name') }}" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @livewireStyles
+        <title>{{ config('app.name') }}</title>
 
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+
+        @filamentStyles
+        @vite('resources/css/app.css')
     </head>
-    <body class="bg-slate-200 dark:bg-slate-700">
 
-        @livewire('partials.navbar')
+    <body class="antialiased">
+        {{ $slot }}
 
-        <main>{{ $slot }}</main>
-
-        @livewire('partials.footer')
-
-        @livewireScripts
+        @filamentScripts
+        @vite('resources/js/app.js')
     </body>
 </html>
