@@ -14,7 +14,7 @@ class ProductDetailPage extends Component
     public function mount($slug)
     {
         $this->product = Product::where('slug', $slug)->firstOrFail();
-        $this->title = $this->product->name . " - ByteWebster";
+        $this->title = $this->product->name . " - Statcareers";
     }
 
     public function render()
